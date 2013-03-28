@@ -4,8 +4,8 @@ import Keys._
 object JacksBuild extends Build {
   val buildSettings = Project.defaultSettings ++ Seq(
     name         := "jacks",
-    version      := "2.1.4",
-    organization := "com.lambdaworks",
+    version      := "2.1.8",
+    organization := "com.cunei",
     scalaVersion := "2.10.1",
 
     crossScalaVersions := Seq("2.10.1", "2.9.2"),
@@ -26,23 +26,18 @@ object JacksBuild extends Build {
     },
 
     publishArtifact in Test := false,
-    publishMavenStyle       := true,
-    publishTo <<= version {
-      val nexus = "https://oss.sonatype.org/"
-      _.trim.endsWith("SNAPSHOT") match {
-        case false => Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-        case true  => Some("snapshots" at nexus + "content/repositories/snapshots")
-      }
-    },
+    publishMavenStyle := false,
+    publishTo := Some(Resolver.url("typesafe-dbuild-temp", new URL("http://typesafe.artifactoryonline.com/typesafe/temp-distributed-build-snapshots/"))(Resolver.ivyStylePatterns)),
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-typesafe-dbuild"),
 
     pomIncludeRepository := { _ => false },
     pomExtra             := (
       <url>http://github.com/wg/jacks</url>
 
       <scm>
-        <connection>scm:git:git://github.com/wg/jacks.git</connection>
-        <developerConnection>scm:git:git://github.com/wg/jacks.git</developerConnection>
-        <url>http://github.com/wg/jacks</url>
+        <connection>scm:git:git://github.com/cunei/jacks.git</connection>
+        <developerConnection>scm:git:git://github.com/cunei/jacks.git</developerConnection>
+        <url>http://github.com/cunei/jacks</url>
       </scm>
 
       <licenses>
@@ -55,8 +50,8 @@ object JacksBuild extends Build {
 
       <developers>
         <developer>
-          <id>will</id>
-          <name>Will Glozer</name>
+          <id>will-cunei</id>
+          <name>Will Glozer (some patches: Antonio Cunei)</name>
         </developer>
       </developers>
     )
