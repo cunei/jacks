@@ -6,12 +6,15 @@ sealed abstract class JacksOption
 object JacksOption {
   case class CaseClassCheckNulls(enabled:Boolean) extends JacksOption
   case class CaseClassSkipNulls(enabled:Boolean) extends JacksOption
+  case class CaseClassRequireKnown(enabled:Boolean) extends JacksOption
 }
 
 
 private[jacks] class JacksOptions(opts:Seq[JacksOption]=Seq.empty) {
-  def caseClassCheckNulls=opts contains JacksOption.CaseClassCheckNulls(true)
-  def caseClassSkipNulls =opts contains JacksOption.CaseClassSkipNulls(true)
+  import JacksOption._
+  def caseClassCheckNulls  =opts contains CaseClassCheckNulls(true)
+  def caseClassSkipNulls   =opts contains CaseClassSkipNulls(true)
+  def caseClassRequireKnown=opts contains CaseClassRequireKnown(true)
 }
 private[jacks] object JacksOptions {
   def apply(opts:JacksOption*) =
