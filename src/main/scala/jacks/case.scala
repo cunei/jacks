@@ -55,7 +55,7 @@ class CaseClassSerializer(t: JavaType, accessors: Array[Accessor], skipNulls: Bo
   @inline final def hasNoDefault(a: Accessor) = a.default == None
 }
 
-class CaseClassDeserializer(t: JavaType, c: Creator, checkNulls: Boolean) extends JsonDeserializer[Any] {
+class CaseClassDeserializer(t: JavaType, c: Creator, checkNulls: Boolean, requireKnown: Boolean) extends JsonDeserializer[Any] {
   val fields = c.accessors.map(a => a.name -> None).toMap[String, Option[Object]]
   val types  = c.accessors.map(a => a.name -> a.`type`).toMap
 
@@ -76,6 +76,8 @@ class CaseClassDeserializer(t: JavaType, c: Creator, checkNulls: Boolean) extend
         }
         values = values.updated(name, Some(value.asInstanceOf[AnyRef]))
       } else {
+        if (requireKnown)
+          throw ctx.mappingException("Property '"+name+"' is unknown at this position.")
         p.nextToken
         p.skipChildren
       }
