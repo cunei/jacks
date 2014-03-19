@@ -8,7 +8,7 @@ object JacksBuild extends Build {
     organization := "com.cunei",
     scalaVersion := "2.10.2",
 
-    crossScalaVersions := Seq("2.10.2", "2.9.3"),
+    crossScalaVersions := Seq("2.10.2", "2.9.3", "2.9.2"),
 
     libraryDependencies <+= scalaVersion("org.scala-lang" % "scalap" % _),
     libraryDependencies ++= Seq(
