@@ -19,7 +19,7 @@ class CaseClassSerializer(t: JavaType, accessors: Array[Accessor], skipNulls: Bo
       val v = value.productElement(i).asInstanceOf[AnyRef]
       val s = p.findValueSerializer(a.`type`, null)
       if (!a.ignored && include(a, s, v)) {
-        g.writeFieldName(a.name)
+        g.writeFieldName(a.external)
         if (v != null) s.serialize(v, g, p) else p.defaultSerializeNull(g)
       }
     }
@@ -58,6 +58,7 @@ class CaseClassSerializer(t: JavaType, accessors: Array[Accessor], skipNulls: Bo
 class CaseClassDeserializer(t: JavaType, c: Creator, checkNulls: Boolean, requireKnown: Boolean) extends JsonDeserializer[Any] {
   val fields = c.accessors.map(a => a.name -> None).toMap[String, Option[Object]]
   val types  = c.accessors.map(a => a.name -> a.`type`).toMap
+  val names  = c.accessors.map(a => a.external -> a.name).toMap
 
   override def deserialize(p: JsonParser, ctx: DeserializationContext): Any = {
     var values = fields
@@ -66,7 +67,7 @@ class CaseClassDeserializer(t: JavaType, c: Creator, checkNulls: Boolean, requir
     var token = p.nextToken
 
     while (token == FIELD_NAME) {
-      val name = p.getCurrentName
+      val name = names.getOrElse(p.getCurrentName, null)
       val t    = types.getOrElse(name, null)
       if (t ne null) {
         val d = ctx.findContextualValueDeserializer(t, null)
@@ -103,10 +104,15 @@ class CaseClassDeserializer(t: JavaType, c: Creator, checkNulls: Boolean, requir
               c.default(a)
             }
           } else {
-            // Jacks 2.1.4 behavior will use c.default().
+            // Jacks 2.2.3 behavior will use c.default().
             // default() should use d.getNullValue, but instead
             // always returns null (even for Option)
-            c.default(a)
+            if (!a.required) {
+              c.default(a)
+            } else {
+              val msg = "%s missing required field '%s'".format(t.getRawClass.getName, a.name)
+              throw ctx.mappingException(msg)
+            }
           }
         }
       }

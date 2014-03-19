@@ -48,6 +48,7 @@ case class Empty(
 )
 
 case class PropertyAnnotation(@JsonProperty("FOO") foo: String)
+case class PropertyRequired(@JsonProperty(required = true) foo: String)
 case class IgnoreAnnotation(@JsonIgnore foo: String = null, bar: String)
 case class IncludeAnnotation(
   @JsonInclude(Include.ALWAYS)      always:     Int         = 0,
@@ -79,6 +80,12 @@ object KitchenSink {
     @JsonProperty("ed")  ed:  String = "emacs"
   ): KitchenSink[T] = KitchenSink[T](foo, bar, if (v == "A") A else B, Editor.withName(ed))
 }
+
+object Outer {
+  case class Nested(s: String)
+}
+
+case class NamingStrategy(camelCase: String, PascalCase: Int)
 
 class CaseClassSuite extends JacksTestSuite {
   test("primitive types correct") {
@@ -153,6 +160,11 @@ class CaseClassSuite extends JacksTestSuite {
     read[PropertyAnnotation](json) should equal (PropertyAnnotation("a"))
   }
 
+  test("@JsonProperty(required = true) handled correctly") {
+    intercept[JsonMappingException] { read[PropertyRequired]("""{}""") }
+    rw(PropertyRequired(null)) should equal (PropertyRequired(null))
+  }
+
   test("@JsonIgnore handled correctly") {
     val json = """{"bar":"b"}"""
     write(IgnoreAnnotation("a", "b")) should equal (json)
@@ -179,6 +191,10 @@ class CaseClassSuite extends JacksTestSuite {
     rw(kss) should equal (kss)
     read[KitchenSink[Int]]("""{"foo":"g","bar":1}""") should equal (ksi)
   }
+
+  test("nested case classes handled correctly") {
+    rw(Outer.Nested("foo")) should equal (Outer.Nested("foo"))
+  }
 }
 
 class InvalidJsonSuite extends JacksTestSuite {
@@ -196,6 +212,19 @@ class InvalidJsonSuite extends JacksTestSuite {
 
   test("deserializing Tuple from non-array throws JsonMappingException") {
     intercept[JsonMappingException] { read[Tuple2[Any, Any]]("123") }
+  }
+
+  test("PropertyNamingStrategy is used correctly") {
+    import com.fasterxml.jackson.databind.PropertyNamingStrategy._
+
+    val m = new JacksMapper(JacksOptions.defaults)
+    m.mapper.setPropertyNamingStrategy(CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+
+    val obj  = NamingStrategy("foo", 1)
+    val json = """{"camel_case":"foo","pascal_case":1}"""
+
+    m.writeValueAsString(obj)         should equal (json)
+    m.readValue[NamingStrategy](json) should equal (obj)
   }
 }
 
