@@ -4,17 +4,17 @@ import Keys._
 object JacksBuild extends Build {
   val buildSettings = Project.defaultSettings ++ Seq(
     name         := "jacks",
-    version      := "2.2.3",
+    version      := "2.2.4", // really 2.2.3, but we published an updated 2.10/2.11 release
     organization := "com.cunei",
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.10.5",
 
-    crossScalaVersions := Seq("2.10.2", "2.9.3", "2.9.2"),
+    crossScalaVersions := Seq("2.11.6", "2.10.5"),
 
     libraryDependencies <+= scalaVersion("org.scala-lang" % "scalap" % _),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-databind" % "2.2.3",
-      "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.10.1" % "test"
+      "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
     ),
 
     scalacOptions ++= Seq("-unchecked", "-optimize"),
@@ -27,7 +27,7 @@ object JacksBuild extends Build {
 
     publishArtifact in Test := false,
     publishMavenStyle := false,
-    publishTo := Some(Resolver.url("typesafe-dbuild-temp", new URL("http://typesafe.artifactoryonline.com/typesafe/temp-distributed-build-snapshots/"))(Resolver.ivyStylePatterns)),
+    publishTo := Some(Resolver.url("typesafe-dbuild-temp", new URL("http://typesafe.artifactoryonline.com/typesafe/ivy-releases/"))(Resolver.ivyStylePatterns)),
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-typesafe-dbuild"),
 
     pomIncludeRepository := { _ => false },
