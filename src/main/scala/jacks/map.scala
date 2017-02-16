@@ -18,7 +18,7 @@ class MapSerializer(t: JavaType) extends StdSerializer[GenMap[Any, Any]](t) {
 
     g.writeStartObject()
 
-    for ((k, v) <- map) {
+    map foreach { case (k,v) =>
       val kA = k.asInstanceOf[AnyRef]
       val vA = v.asInstanceOf[AnyRef]
 
