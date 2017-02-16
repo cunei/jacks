@@ -4,7 +4,7 @@ import Keys._
 object JacksBuild extends Build {
   val buildSettings = Project.defaultSettings ++ Seq(
     name         := "jacks",
-    version      := "2.2.4", // really 2.2.3, but we published an updated 2.10/2.11 release
+    version      := "2.2.5", // really 2.2.3, but we published an updated 2.10/2.11/2.12 release
     organization := "com.cunei",
     scalaVersion := "2.10.5",
 
