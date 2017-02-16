@@ -8,13 +8,13 @@ object JacksBuild extends Build {
     organization := "com.cunei",
     scalaVersion := "2.10.5",
 
-    crossScalaVersions := Seq("2.11.6", "2.10.5"),
+    crossScalaVersions := Seq("2.12.1", "2.11.6", "2.10.5"),
 
     libraryDependencies <+= scalaVersion("org.scala-lang" % "scalap" % _),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-databind" % "2.2.3",
-      "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
+      "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
     ),
 
     scalacOptions ++= Seq("-unchecked", "-optimize"),
